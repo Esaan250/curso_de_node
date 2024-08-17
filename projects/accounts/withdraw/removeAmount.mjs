@@ -2,7 +2,7 @@ import fs from "fs";
 import chalk from "chalk";
 import getAccount from "../getAccount/getAccount.mjs";
 import withdraw from "./withdraw.mjs";
-import operation from "../index.mjs";
+import operation from "../operation/operation.mjs";
 
 const removeAmount = (accountName, amount) => {
   const account = getAccount(accountName);
@@ -24,6 +24,6 @@ const removeAmount = (accountName, amount) => {
     }
   );
   console.log(chalk.green(`Saque de R$ ${amount} realizado com sucesso.`));
-  operation();
+  operation(accountName);
 };
 export default removeAmount;
