@@ -1,6 +1,6 @@
 import express from "express";
 import exphbs from "express-handlebars";
-import mysql from "mysql2";
+import pool from "./db/connection.mjs";
 
 const hbs = exphbs.create({
   partialsDir: ["views/partials"],
@@ -15,28 +15,9 @@ app.set("view engine", "handlebars");
 app.get("/", (req, res) => {
   res.render("home");
 });
-// CRIAR CONEXÃO COM MYSQL
-const connection = mysql.createConnection({
-  // HOST É O ENDEREÇO
-  host: "localhost",
-  // USER É... CÊ JÁ SABE
-  user: "esaansql",
-  // PASSWORD TAMBÉM
-  password: "@Edrampak250",
-  // DATABASE É O BANCO AO QUAL VOCÊ QUER SE CONECTAR
-  database: "sql_datapod",
-});
-connection.connect((error) => {
-  if (error) {
-    console.log(error);
-  } else {
-    console.log("MySQL Conectado!");
-    app.listen(gateway);
-  }
-});
 app.get("/books", (req, res) => {
   const sql = "SELECT * FROM books";
-  connection.query(sql, (error, data) => {
+  pool.query(sql, (error, data) => {
     if (error) {
       console.log(error);
       return;
@@ -47,12 +28,40 @@ app.get("/books", (req, res) => {
     }
   });
 });
-
+app.get("/books/:id", (req, res) => {
+  const id = req.params.id;
+  const sql = `SELECT * FROM books WHERE ?? = ?`;
+  const data = ["id", id];
+  pool.query(sql, data, (error, data) => {
+    if (error) {
+      res.redirect("/");
+      console.log(error);
+    } else {
+      const book = data[0];
+      res.render("book", { book });
+    }
+  });
+});
+app.get("/books/edit/:id", (req, res) => {
+  const id = req.params.id;
+  const sql = `SELECT * FROM books WHERE ?? = ?`;
+  const data = ["id", id];
+  pool.query(sql, data, (error, data) => {
+    if (error) {
+      console.log(error);
+      return;
+    } else {
+      const book = data[0];
+      res.render("editBook", { book });
+    }
+  });
+});
 app.post("/books/insertbook", (req, res) => {
   const title = req.body.title;
   const pagesqty = req.body.pagesqty;
-  const sql = `INSERT INTO books (title,pageqty) VALUES ("${title}","${pagesqty}")`;
-  connection.query(sql, (error) => {
+  const sql = `INSERT INTO books (??, ??) VALUES (?, ?)`;
+  const data = ["title", "pageqty", title, pagesqty];
+  pool.query(sql, data, (error) => {
     if (error) {
       console.log(error);
     } else {
@@ -60,16 +69,32 @@ app.post("/books/insertbook", (req, res) => {
     }
   });
 });
-app.get("/books/:id", (req, res) => {
-  const id = req.params.id;
-  const sql = `SELECT * FROM books WHERE id = ${id}`;
-  connection.query(sql, (error, data) => {
+app.post("/books/updatebook", (req, res) => {
+  const id = req.body.id;
+  const title = req.body.title;
+  const pagesqty = req.body.pagesqty;
+  const sql = `UPDATE books SET title = '${title}', pageqty = '${pagesqty}' WHERE id = ${id}`;
+  pool.query(sql, (error, data) => {
     if (error) {
       console.log(error);
-      res.redirect("/");
+      return;
     } else {
-      const book = data[0];
-      res.render("book", { book });
+      res.redirect("/books");
     }
   });
+});
+app.post("/books/remove/:id", (req, res) => {
+  const id = req.params.id;
+  const sql = `DELETE FROM books WHERE id = ${id}`;
+  pool.query(sql, (error) => {
+    if (error) {
+      console.log(error);
+      return;
+    } else {
+      res.redirect("/books");
+    }
+  });
+});
+app.listen(3000, () => {
+  console.log("Servidor conectado.");
 });
