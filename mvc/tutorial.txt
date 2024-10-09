@@ -1,0 +1,57 @@
+(1) CRIAR BANCO DE DADOS MYSQL:
+
+CREATE DATABASE nomedobanco
+
+(2) USAR BANCO DE DADOS
+
+USE nomedobanco
+
+(3) MOSTRAR BANCOS DE DADOS
+
+SHOW DATABASES
+
+(4) APAGAR BANCO DE DADOS
+
+DROP DATABASE nomedobanco
+
+(5) EXPORTAR BANCO PARA ARQUIVO .SQL
+
+mysqldump -u usuario nomedobanco > nomedoarquivo.sql
+
+(6) CRIAR TABELA
+
+CREATE TABLE nomedatabela (nomedacoluna tipodedado(quantidade de caracteres))
+CREATE TABLE skytowndata (gift varchar(155))
+
+(7) APAGAR TABELA
+
+DROP TABLE nomedobanco
+
+(8) INSERIR DADOS NUM BANCO
+
+INSERT INTO nomedatabela (coluna) VALUES ("dadosASeremInseridos")
+
+(9) ADICIONAR COLUNA
+
+ALTER TABLE nomedatabela ADD COLUMN nomedacoluna tipo
+
+(9) APAGAR COLUNA
+
+ALTER TABLE nomedatabela DROP COLUMN
+
+(10) MODIFICAR TIPO DA COLUNA
+
+ALTER TABLE nomedatabela MODIFY COLUMN nomedacoluna tipo
+
+(11) LISTANDO DADOS COM WHERE
+
+SELECT * FROM nomedatabela WHERE nomedacoluna = valordesejado
+
+(12) ATUALIZANDO DADOS COM WHERE
+
+UPDATE tabela SET coluna = valornovo WHERE coluna = valor antigo
+
+(13) APAGANDO DADOS COM WHERE
+
+DELETE FROM nomedatabela WHERE condição
+Ex: DELETE FROM workers WHERE position = 17
