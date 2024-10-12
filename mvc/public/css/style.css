@@ -88,6 +88,10 @@ form input[type="submit"] {
 .task-list .title:hover {
   color: #333;
 }
+.title.done {
+  text-decoration: line-through;
+  color: #ccc;
+}
 
 .actions {
   display: flex;
