@@ -1,0 +1,13 @@
+import express from "express";
+import UsersControllers from "../controllers/UsersController.mjs";
+const router = express.Router();
+router.get("/users", UsersControllers.showUsers);
+router.get("/users/create", UsersControllers.createUserPage);
+router.post("/users/create", UsersControllers.createUser);
+router.get("/users/:id", UsersControllers.showUser);
+router.post("/users/delete/:id", UsersControllers.deleteUser);
+router.get("/users/edit/:id", UsersControllers.editUserPage);
+router.post("/users/update", UsersControllers.updateUser);
+router.post("/address/create", UsersControllers.createAdress);
+router.post("/address/delete", UsersControllers.deleteAdress);
+export default router;
