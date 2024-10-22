@@ -1,5 +1,10 @@
 import { Router } from "express";
+import checkAuth from "../helpers/auth.mjs";
 import ToughtsController from "../controllers/ToughtsController.mjs";
 const router = Router();
+router.get("/add", checkAuth, ToughtsController.createTought);
+router.post("/add", checkAuth, ToughtsController.createToughtSave);
+router.get("/dashboard", checkAuth, ToughtsController.dashboard);
+router.post("/remove", checkAuth, ToughtsController.removeTought);
 router.get("/", ToughtsController.showToughts);
 export default router;
