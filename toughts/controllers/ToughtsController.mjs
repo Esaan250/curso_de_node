@@ -37,36 +37,30 @@ export default class ToughController {
       })
       .catch((err) => console.log());
   }
-  static showToughts(req, res) {
-    console.log(req.query);
-    // check if user is searching
+  static async showToughts(req, res) {
     let search = "";
     if (req.query.search) {
       search = req.query.search;
     }
-    // order results, newest first
     let order = "DESC";
     if (req.query.order === "old") {
       order = "ASC";
     } else {
       order = "DESC";
     }
-    Tought.findAll({
+    const toughtsData = await Tought.findAll({
       include: User,
       where: {
         title: { [Op.like]: `%${search}%` },
       },
       order: [["createdAt", order]],
-    })
-      .then((data) => {
-        let toughtsQty = data.length;
-        if (toughtsQty === 0) {
-          toughtsQty = false;
-        }
-        const toughts = data.map((result) => result.get({ plain: true }));
-        res.render("toughts/home", { toughts, toughtsQty, search });
-      })
-      .catch((err) => console.log(err));
+    });
+    const toughts = toughtsData.map((result) => result.get({ plain: true }));
+    let toughtsQty = toughts.length;
+    if (toughtsQty === 0) {
+      toughtsQty = false;
+    }
+    res.render("toughts/home", { toughts, search, toughtsQty });
   }
   static removeTought(req, res) {
     const id = req.body.id;
@@ -78,5 +72,23 @@ export default class ToughController {
         });
       })
       .catch((err) => console.log());
+  }
+  static async editTought(req, res) {
+    const id = req.params.id;
+    const tought = await Tought.findOne({ where: { id: id }, raw: true });
+    res.render("toughts/edit", { tought });
+  }
+  static async editToughtSave(req, res) {
+    const id = req.body.id;
+    const tought = { title: req.body.title };
+    await Tought.update(tought, { where: { id: id } });
+    try {
+      req.flash("message", "Pensamento atualizado com sucesso!");
+      req.session.save(() => {
+        res.redirect("/toughts/dashboard");
+      });
+    } catch (error) {
+      console.log("Ocorreu o seguinte erro:" + error);
+    }
   }
 }
