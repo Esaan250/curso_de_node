@@ -1,0 +1,10 @@
+import { Router } from "express";
+import checkAuth from "../helpers/auth.mjs";
+import bankController from "../controllers/bankController.mjs";
+const router = Router();
+router.get("/", checkAuth, bankController.homePage);
+router.get("/deposit", checkAuth, bankController.depositPage);
+router.post("/deposit", checkAuth, bankController.depositPost);
+router.get("/transfer", checkAuth, bankController.transferPage);
+router.post("/transfer", checkAuth, bankController.transferPost);
+export default router;
