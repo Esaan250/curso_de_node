@@ -1,0 +1,24 @@
+<div class="container">
+  <h1>Transferência Bancária</h1>
+  {{#if message}}
+    <div class="alert alert-info">{{message}}</div>
+  {{/if}}
+  <form action="/transfer" method="POST">
+    <div class="form-group">
+      <label for="recipientId">ID do Destinatário:</label>
+      <input type="number" id="userid" name="userid" required min="1" />
+    </div>
+    <div class="form-group">
+      <label for="amount">Valor da Transferência:</label>
+      <input
+        type="number"
+        id="amount"
+        name="amount"
+        required
+        step="0.01"
+        min="0.01"
+      />
+    </div>
+    <button type="submit">Transferir</button>
+  </form>
+</div>
