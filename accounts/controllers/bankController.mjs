@@ -1,6 +1,4 @@
 import Bank from "../models/Bank.mjs";
-import User from "../models/User.mjs";
-import { Op } from "sequelize";
 export default class bankController {
   static async homePage(req, res) {
     const userId = req.session.userid;
@@ -10,10 +8,6 @@ export default class bankController {
       },
     });
     const balance = bank.balance;
-
-    // const id = req.params.id;
-    // const tought = await Tought.findOne({ where: { id: id }, raw: true });
-    // res.render("toughts/edit", { tought });
     res.render("operations/homepage", { balance });
   }
   static depositPage(req, res) {
@@ -53,24 +47,75 @@ export default class bankController {
     res.render("operations/transfer");
   }
   static async transferPost(req, res) {
-    const recipient = req.body.userid;
+    const senderId = req.session.userid; // ID da conta remetente
+    const recipientId = req.body.userid; // ID da conta destinatária
     const amount = req.body.amount;
     try {
-      const depositValue = parseFloat(amount);
-      let bankAccount = await Bank.findOne({ where: { UserId: recipient } });
-      if (!bankAccount) {
-        console.log("Conta não encontrada. Tente novamente.");
+      const transferAmount = parseFloat(amount);
+      // Busca as contas do remetente e do destinatário
+      let senderAccount = await Bank.findOne({ where: { UserId: senderId } });
+      let recipientAccount = await Bank.findOne({
+        where: { UserId: recipientId },
+      });
+
+      if (!senderAccount) {
+        console.log("Conta do remetente não encontrada.");
         return res.redirect("/transfer");
       }
-      bankAccount.balance += depositValue;
-      await bankAccount.save();
-      req.flash("message", "Depósito realizado com sucesso.");
+
+      if (!recipientAccount) {
+        console.log("Conta do destinatário não encontrada.");
+        return res.redirect("/transfer");
+      }
+
+      // Verifica se o remetente tem saldo suficiente
+      if (senderAccount.balance < transferAmount) {
+        console.log("Saldo insuficiente para transferência.");
+        return res.redirect("/transfer");
+      }
+
+      // Atualiza os saldos
+      senderAccount.balance -= transferAmount;
+      recipientAccount.balance += transferAmount;
+
+      // Salva as atualizações nas contas
+      await senderAccount.save();
+      await recipientAccount.save();
+
+      console.log("Transferência realizada com sucesso.");
       req.session.save(() => {
         res.redirect("/");
       });
     } catch (error) {
-      console.log(`Erro ao processar o depósito: ${error}`);
+      console.log(`Erro ao processar a transferência: ${error}`);
       res.redirect("/transfer");
+    }
+  }
+  static withdrawPage(req, res) {
+    res.render("operations/withdraw");
+  }
+  static async withdrawPost(req, res) {
+    const userid = req.session.userid;
+    const amount = req.body.amount;
+    const withdraw = parseFloat(amount);
+    try {
+      const userAccount = await Bank.findOne({ where: { UserId: userid } });
+      if (!userAccount) {
+        console.log("Conta não encontrada.");
+        return res.redirect("/withdraw");
+      }
+      if (userAccount.balance < withdraw) {
+        console.log("Saldo insuficiente para sacar.");
+        return res.redirect("/withdraw");
+      }
+      userAccount.balance -= withdraw;
+      await userAccount.save();
+      console.log("Saque realizado com sucesso.");
+      req.session.save(() => {
+        res.redirect("/");
+      });
+    } catch (error) {
+      console.log(`Falha na operação: ${error}`);
     }
   }
 }
