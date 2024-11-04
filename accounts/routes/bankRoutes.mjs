@@ -7,4 +7,6 @@ router.get("/deposit", checkAuth, bankController.depositPage);
 router.post("/deposit", checkAuth, bankController.depositPost);
 router.get("/transfer", checkAuth, bankController.transferPage);
 router.post("/transfer", checkAuth, bankController.transferPost);
+router.get("/withdraw", checkAuth, bankController.withdrawPage);
+router.post("/withdraw", checkAuth, bankController.withdrawPost);
 export default router;
